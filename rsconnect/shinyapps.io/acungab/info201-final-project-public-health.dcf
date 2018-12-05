@@ -1,0 +1,12 @@
+name: info201-final-project-public-health
+title: info201-final-project-public-health
+username:
+account: acungab
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 605776
+bundleId: 1744158
+url: https://acungab.shinyapps.io/info201-final-project-public-health/
+when: 1544052220.85353
+asMultiple: FALSE
+asStatic: FALSE

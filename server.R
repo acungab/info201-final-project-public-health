@@ -163,31 +163,35 @@ function(input, output) {
   })
   
   ################ Hispanic Division ############
-  non_hispanic_men <- filter(census, SEX == 1, ORIGIN == 1) %>% nrow()
-  non_hispanic_women <- filter(census, SEX == 2, ORIGIN == 1) %>% nrow()
+  non_hispanic_df <- reactive({
+    non_hispanic_men <- filter(census, SEX == 1, ORIGIN == 1, STNAME == input$hispanic_state_pick) %>% nrow()
+    non_hispanic_women <- filter(census, SEX == 2, ORIGIN == 1, STNAME == input$hispanic_state_pick) %>% nrow()
+    
+    num <- c(non_hispanic_men,non_hispanic_women)
+    gender <- c("male", "female")
+    
+    non_hispanic_df <- data.frame(num,gender)
+    non_hispanic_df <- mutate(non_hispanic_df, percentages = round(num/sum(non_hispanic_df[[1]]), digits = 3) * 100)
+  })
   
-  num <- c(non_hispanic_men,non_hispanic_women)
-  gender <- c("male", "female")
-  
-  non_hispanic_df <- data.frame(num,gender)
-  non_hispanic_df <- mutate(non_hispanic_df, percentages = round(num/sum(non_hispanic_df[[1]]), digits = 3) * 100)
-
-  hispanic_men <- filter(census, SEX == 1, ORIGIN == 2) %>% nrow()
-  hispanic_women <- filter(census, SEX == 2, ORIGIN == 2) %>% nrow()
-  
-  num <- c(hispanic_men,hispanic_women)
-  gender <- c("male", "female")
-  
-  hispanic_df <- data.frame(num,gender)
-  hispanic_df <- mutate(hispanic_df, percentages = round(num/sum(hispanic_df[[1]]), digits = 3) * 100)
+  hispanic_df <- reactive({
+    hispanic_men <- filter(census, SEX == 1, ORIGIN == 2, STNAME == input$hispanic_state_pick) %>% nrow()
+    hispanic_women <- filter(census, SEX == 2, ORIGIN == 2, STNAME == input$hispanic_state_pick) %>% nrow()
+    
+    num <- c(hispanic_men,hispanic_women)
+    gender <- c("male", "female")
+    
+    hispanic_df <- data.frame(num,gender)
+    hispanic_df <- mutate(hispanic_df, percentages = round(num/sum(hispanic_df[[1]]), digits = 3) * 100)
+  })
   
   
   # Here we obtain a dataset with ALL Hispanic people, or no Hispanic people at all
   pie_dataset <- reactive({
     if (input$hispanic_or_not) {
-      pie_dataset <- hispanic_df
+      pie_dataset <- hispanic_df()
     } else {
-      pie_dataset <- non_hispanic_df
+      pie_dataset <- non_hispanic_df()
     }
   })
   

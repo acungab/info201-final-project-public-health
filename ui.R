@@ -66,6 +66,9 @@ ui <- fluidPage(
                       
                       sidebarPanel(width = 20,
                                    checkboxInput("hispanic_or_not",label = "Hispanic")
+                      ),
+                      selectInput("hispanic_state_pick", label = "State Pick", 
+                                  choices = usa_states
                       )
              ),
              tabPanel("Race Division Chart", plotOutput("race_plot"),
