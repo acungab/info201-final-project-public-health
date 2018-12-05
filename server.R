@@ -44,4 +44,12 @@ function(input, output) {
     ethnic_group <- paste0(c("Not Hispanic: ", "Hispanic: "), ethnic_pct, "%")
     pie3D(ethnic_slice, labels = ethnic_group, col=c("azure", "brown3"))
   })
+  output$ethnictext <- renderText({
+    county <- filter(wa, CTYNAME == input$countyname) %>%
+      filter(IMPRACE == input$raceoption)
+    ethnic_data <- group_by(county, ORIGIN) %>%
+      summarize(RESPOP = sum(RESPOP))
+    paste0("In general, there are ", ethnic_data[1, 2], " non Hispanics and ", 
+           ethnic_data[2, 2], " Hispanics of corresponding race in ", input$countyname, ".")
+  })
 }
