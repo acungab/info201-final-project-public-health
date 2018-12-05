@@ -3,7 +3,7 @@ library(ggplot2)
 library(dplyr)
 
 ui <- fluidPage(
-  titlePanel("UFO sightings in US"),
+  titlePanel("Population Overview in the US"),
   navbarPage("",
              tabPanel("Age",
                       sidebarLayout(
@@ -25,8 +25,20 @@ ui <- fluidPage(
              tabPanel("Summary",
                       mainPanel(
                         textOutput("summary"))
-             )
+             ),
+             tabPanel("Bar Chart", plotOutput("plot"),
+                      
+                      ##This widget will change the color of the bar on the graph and will be in side panel
+                      sidebarPanel(width = 20,
+                                   radioButtons("color_scheme",
+                                                label = "What color?",
+                                                choices = c("red", "Green", "Blue"))))
+                                   
+                              
   )
   
 )
 
+  
+    
+    
