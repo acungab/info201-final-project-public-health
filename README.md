@@ -1,6 +1,8 @@
-#Info201 Final Project
 
-##**Our Purpose for this Project:**
+
+# Info201 Final Project
+
+## **Our Purpose for this Project:**
 
   One of the main words leading our research for this project is: Discovery. We all live in the United States, but we asked ourselves how much do we really know about it?
   A lot of people here at the University of Washington are only focused on school and what is next, which leads to the lack of understanding of what is happening around them.
@@ -18,7 +20,7 @@
   The purpose of this project was to discover what's beyond our university walls. This project gave us inspiration to learn more about our society and how important diversity is within and
   outside our community. Overall, this taught us the values of learning about different racial and social groups and we all are excited to keep learning and sharing this topic.
 
-##**Final Project Site:**
+## **Final Project Site:**
 
-##**Our Dataset:**
+## **Our Dataset:**
   https://www.census.gov/data/datasets/2010/demo/popest/modified-race-data-2010.html
