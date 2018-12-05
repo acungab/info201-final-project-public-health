@@ -2,11 +2,11 @@ library(ggplot2)
 library(plotrix)
 source("ui.R")
 function(input, output) {
+  
+  ##################### Age and Gender Analysis #############
   age_label <- c("0-4", "5-9","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49",
                  "50-54", "55-59", "60-64","65-69","70-74","75-79",
                  "80-84","85 <=")    
-  
-  
   
   DataMale <- function(stateInput){
     listM <- list()
@@ -110,6 +110,7 @@ function(input, output) {
            " people.")
   })
   
+  ################## Racial Analysis Washington #############
   output$bar <- renderPlot({
     county <- filter(wa, CTYNAME == input$countyname) %>%
       filter(IMPRACE == input$raceoption)
@@ -123,7 +124,7 @@ function(input, output) {
       geom_text(aes(label=RESPOP), vjust=-0.4, size=3) +
       theme_minimal() + xlab("Age group (years)") + ylab("Population") +
       scale_x_discrete(labels = age_group) + theme_bw()
-    })
+  })
   output$genderpie <- renderPlot({
     county <- filter(wa, CTYNAME == input$countyname) %>%
       filter(IMPRACE == input$raceoption)
@@ -159,5 +160,67 @@ function(input, output) {
       summarize(RESPOP = sum(RESPOP))
     paste0("In general, there are ", ethnic_data[1, 2], " non Hispanics and ", 
            ethnic_data[2, 2], " Hispanics of corresponding race in ", input$countyname, ".")
+  })
+  
+  ################ Hispanic Division ############
+  non_hispanic_men <- filter(census, SEX == 1, ORIGIN == 1) %>% nrow()
+  non_hispanic_women <- filter(census, SEX == 2, ORIGIN == 1) %>% nrow()
+  
+  num <- c(non_hispanic_men,non_hispanic_women)
+  gender <- c("male", "female")
+  
+  non_hispanic_df <- data.frame(num,gender)
+  non_hispanic_df <- mutate(non_hispanic_df, percentages = round(num/sum(non_hispanic_df[[1]]), digits = 3) * 100)
+
+  hispanic_men <- filter(census, SEX == 1, ORIGIN == 2) %>% nrow()
+  hispanic_women <- filter(census, SEX == 2, ORIGIN == 2) %>% nrow()
+  
+  num <- c(hispanic_men,hispanic_women)
+  gender <- c("male", "female")
+  
+  hispanic_df <- data.frame(num,gender)
+  hispanic_df <- mutate(hispanic_df, percentages = round(num/sum(hispanic_df[[1]]), digits = 3) * 100)
+  
+  
+  # Here we obtain a dataset with ALL Hispanic people, or no Hispanic people at all
+  pie_dataset <- reactive({
+    if (input$hispanic_or_not) {
+      pie_dataset <- hispanic_df
+    } else {
+      pie_dataset <- non_hispanic_df
+    }
+  })
+  
+  hispanic_pie <- reactive({
+    ggplot(data = pie_dataset(), aes(x = "", y = num, fill = gender)) +
+      geom_bar(width = 1, stat = "identity") +
+      geom_text(aes(label = paste0(percentages, "%")), position = position_stack(vjust = 0.5)) +
+      coord_polar("y", start = 0) + xlab(" ") + ylab("Population")
+  })
+  output$hispanic_plot <- renderPlot(hispanic_pie())
+  
+  ############### Race Division ###########
+  filtered_ethinicity <- filter(census, IMPRACE == 1 | IMPRACE == 2 | IMPRACE == 3 | IMPRACE == 4 | IMPRACE == 5)
+  state <- as.data.frame(table(filtered_ethinicity$IMPRACE), stringsAsFactors = FALSE)
+  colnames(state) <- c("Race", "Number_of_People")
+  state$Race[1] = "White Population"
+  state$Race[2] = "Black Population"
+  state$Race[3] = "American Indian Population"
+  state$Race[4] = "Asian Population"
+  state$Race[5] = "Native Hawaiian Population"
+  
+  reactive_data = reactive({
+    selected_output = input$cases
+    return(state[state$Race==selected_output,])
+  })
+  
+  output$race_plot <- renderPlot({
+    
+    ggplot(data = state, aes(x = Race, y = Number_of_People)) +
+      geom_bar(stat = 'identity', width = .4, fill = paste0("dark", input$color_scheme)) + 
+      geom_text(aes(label = Race), vjust = -.3, size = 2.5) + 
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5)) +
+      ggtitle("Race Division in states") 
+    
   })
 }

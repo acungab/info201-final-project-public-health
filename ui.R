@@ -61,8 +61,24 @@ ui <- fluidPage(
                           )
                         )
                       )
+             ),
+             tabPanel("Hispanic Population", plotOutput("hispanic_plot"), 
+                      
+                      sidebarPanel(width = 20,
+                                   checkboxInput("hispanic_or_not",label = "Hispanic")
+                      )
+             ),
+             tabPanel("Race Division Chart", plotOutput("race_plot"),
+                      
+                      ##This widget will change the color of the bar on the graph and will be in side panel
+                      sidebarPanel(width = 20,
+                                   radioButtons("color_scheme",
+                                                label = "What color?",
+                                                choices = c("Red", "Green", "Blue")
+                                   ))
+                      
              )
-  )
+      )
 )
 
 
