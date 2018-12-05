@@ -3,10 +3,12 @@ library(ggplot2)
 library(plyr)
 library(dplyr)
 library(ggthemes)
+library(data.table)
 
-census <- read.csv("census.csv", stringsAsFactors = F)
 
 server <- function(input,output){
+  census <- read.csv("data/stco-mr2010-1.csv", stringsAsFactors = F)
+  census <- as.data.frame(census) 
 #   output$summary <- renderPrint({
 #     if(census$STNAME == input$state){
 #       message <- print("You are currently looking at the age distribution in", input$state)
@@ -16,7 +18,30 @@ server <- function(input,output){
 #     }
 #     return(message)
 # })
+  filtered_ethinicity <- filter(census, IMPRACE == "1" | IMPRACE == 2 | IMPRACE == 3 | IMPRACE == 4 | IMPRACE == 5)
+  state <- as.data.frame(table(filtered_ethinicity$IMPRACE), stringsAsFactors = FALSE)
+  colnames(state) <- c("Race", "Number_of_People")
+  state$Race[1] = "White Population"
+  state$Race[2] = "Black Population"
+  state$Race[3] = "American Indian Population"
+  state$Race[4] = "Asian Population"
+  state$Race[5] = "Native Hawaiian Population"
+  
+  reactive_data = reactive({
+    selected_output = input$cases
+    return(state[state$Race==selected_output,])
+  })
+  
+  output$plot <- renderPlot({
     
+    ggplot(data = state, aes(x = Race, y = Number_of_People)) +
+      geom_bar(stat = 'identity', width = .4, fill = paste0("dark", input$color_scheme)) + 
+      geom_text(aes(label = Race), vjust = -.3, size = 2.5) + 
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5)) +
+      ggtitle("Race Division in states") 
+    
+  })
+  
   output$map <- renderPlot({
     
    if(input$g == "Bar Graph"){
