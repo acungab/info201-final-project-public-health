@@ -21,6 +21,7 @@
   outside our community. Overall, this taught us the values of learning about different racial and social groups and we all are excited to keep learning and sharing this topic.
 
 ## **Final Project Site:**
+https://acungab.shinyapps.io/info201-final-project-public-health/
 
 ## **Our Dataset:**
   https://www.census.gov/data/datasets/2010/demo/popest/modified-race-data-2010.html
