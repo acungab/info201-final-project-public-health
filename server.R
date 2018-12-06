@@ -83,7 +83,6 @@ function(input, output) {
                            labels = lbls) + # Labels
         coord_flip() +  # Flip axes
         labs(title=paste0("Age Distribution and Gender of ", input$state)) +
-        # theme_tufte() +  # Tufte theme from ggfortify
         theme(plot.title = element_text(hjust = .5),
               axis.ticks = element_blank()) +   # Centre plot title
         scale_fill_brewer(palette = "green1") + # Color palette
@@ -93,7 +92,7 @@ function(input, output) {
     chart1
   })
   
-  output$message <- renderText({
+  output$age_gender_messages <- renderText({
     
     stateInput <- input$state
     dfM <- DataMale(stateInput)
@@ -140,8 +139,17 @@ function(input, output) {
       filter(IMPRACE == input$raceoption)
     gender_data <- group_by(county, SEX) %>%
       summarize(RESPOP = sum(RESPOP))
-    paste0("In general, there are ", gender_data[1, 2], " males and ", 
-           gender_data[2, 2], " females of corresponding race in ", input$countyname, ".")
+    racedf <- as.data.frame(c(1:11))
+    racedf$races <- c("White", "Black or African Amercian",
+                      "American Indian and Alaska Native", "Asian",
+                      "Native Hawaiian and Other Pacific Islander", 
+                      "White + Black or African American", "",
+                      "White + Asian", "", "",
+                      "Black or African American + Asian") 
+    paste0("You are looking at the ", racedf[input$raceoption, 2],
+           " race of ", input$countyname, ". In general, there are ", 
+           gender_data[1, 2], " males and ", 
+           gender_data[2, 2], " females in the county.")
   })
   output$ethnicpie <- renderPlot({
     county <- filter(wa, CTYNAME == input$countyname) %>%
@@ -158,8 +166,17 @@ function(input, output) {
       filter(IMPRACE == input$raceoption)
     ethnic_data <- group_by(county, ORIGIN) %>%
       summarize(RESPOP = sum(RESPOP))
-    paste0("In general, there are ", ethnic_data[1, 2], " non Hispanics and ", 
-           ethnic_data[2, 2], " Hispanics of corresponding race in ", input$countyname, ".")
+    racedf <- as.data.frame(c(1:11))
+    racedf$races <- c("White", "Black or African Amercian",
+                      "American Indian and Alaska Native", "Asian",
+                      "Native Hawaiian and Other Pacific Islander", 
+                      "White + Black or African American", "",
+                      "White + Asian", "", "",
+                      "Black or African American + Asian") 
+    paste0("You are looking at the ", racedf[input$raceoption, 2],
+           " race of ", input$countyname, ". In general, there are ", 
+           ethnic_data[1, 2], " non Hispanics and ", 
+           ethnic_data[2, 2], " Hispanics in the county.")
   })
   
   ################ Hispanic Division ############
@@ -201,30 +218,59 @@ function(input, output) {
       geom_text(aes(label = paste0(percentages, "%")), position = position_stack(vjust = 0.5)) +
       coord_polar("y", start = 0) + xlab(" ") + ylab("Population")
   })
+  
   output$hispanic_plot <- renderPlot(hispanic_pie())
+  
+  output$hispanic_messages <- renderText({
+    
+    if (input$hispanic_or_not) {
+      paste0("The Hispanic male percentage for ", input$hispanic_state_pick, " is ", hispanic_df()$percentages[[1]], 
+             "% and the Hispanic female percentage is ", hispanic_df()$percentages[[2]], "%. This displays the diversity of gender spread per US State.", 
+             " Such data can be used for various lines-of-business, but can be very prevalent for political campaigns.")
+    } else {
+      paste0("The non-Hispanic male percentage for ", input$hispanic_state_pick, " is ", non_hispanic_df()$percentages[[1]], 
+             "% and the non-Hispanic female percentage is ", non_hispanic_df()$percentages[[2]], "%. This displays the diversity of gender spread per US State.", 
+             " Such data can be used for various lines-of-business, but can be very prevalent for political campaigns.")
+    }
+    
+  })
   
   ############### Race Division ###########
   filtered_ethinicity <- filter(census, IMPRACE == 1 | IMPRACE == 2 | IMPRACE == 3 | IMPRACE == 4 | IMPRACE == 5)
-  state <- as.data.frame(table(filtered_ethinicity$IMPRACE), stringsAsFactors = FALSE)
-  colnames(state) <- c("Race", "Number_of_People")
-  state$Race[1] = "White Population"
-  state$Race[2] = "Black Population"
-  state$Race[3] = "American Indian Population"
-  state$Race[4] = "Asian Population"
-  state$Race[5] = "Native Hawaiian Population"
   
-  reactive_data = reactive({
-    selected_output = input$cases
-    return(state[state$Race==selected_output,])
-  })
+  list_pop <- list()
+  DataWhite <- function(inputState){
+    for(i in 1:5){
+      bigD1 <- filter(census, STNAME == inputState)
+      m1 <- filter(bigD1, IMPRACE == i)
+      pop <- sum(m1$RESPOP)
+      list_pop[i] <-pop
+      
+    }
+    
+    df_pop <- data.frame(matrix(unlist(list_pop), nrow=5, byrow=T))
+    names(df_pop)<- c("Population")
+    df_pop$Race <- c("White Population", "Black Population", "American Indian Population", "Asian Population", "Native Hawaiian Population")
+    return (df_pop)
+    }
   
   output$race_plot <- renderPlot({
-    
-    ggplot(data = state, aes(x = Race, y = Number_of_People)) +
+    inputState <- input$name
+    df_pop <- DataWhite(inputState)
+    ggplot(data = df_pop, aes(x = Race, y = Population)) +
       geom_bar(stat = 'identity', width = .4, fill = paste0("dark", input$color_scheme)) + 
-      geom_text(aes(label = Race), vjust = -.3, size = 2.5) + 
+      geom_text(aes(label = Population), vjust = -.3, size = 3.5) + 
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5)) +
-      ggtitle("Race Division in states") 
+      ggtitle("Race Division in States") 
     
+  })
+  output$race_messages <- renderText({
+    
+    inputState <- input$name
+    df_pop <- DataWhite(inputState)
+    
+    paste0("The white population in ", inputState, " is ", df_pop[1, 1], ". The black population in ", inputState, " is ", df_pop[2, 1], ". The American Indian population in ", inputState, " is ", df_pop[3, 1],
+           ". The Asian population in ", inputState, " is ", df_pop[4, 1], ". The Native Hawaiian population in ", inputState, " is ", df_pop[5, 1], ". This shows the diversity throught the whole United States
+           at the state level and the national level.")
   })
 }

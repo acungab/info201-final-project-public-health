@@ -34,7 +34,7 @@ ui <- fluidPage(
                       mainPanel(
                         plotOutput("map", width = "150%", height = "500px"),
                         column(12, offset = 3,
-                               textOutput("message")
+                               textOutput("age_gender_messages")
                         )
                       )
              ),
@@ -69,16 +69,23 @@ ui <- fluidPage(
                       ),
                       selectInput("hispanic_state_pick", label = "State Pick", 
                                   choices = usa_states
-                      )
+                      ),
+                      textOutput("hispanic_messages")
              ),
-             tabPanel("Race Division Chart", plotOutput("race_plot"),
+             tabPanel("Race Division Chart", plotOutput("race_plot"),  
                       
                       ##This widget will change the color of the bar on the graph and will be in side panel
                       sidebarPanel(width = 20,
                                    radioButtons("color_scheme",
                                                 label = "What color?",
                                                 choices = c("Red", "Green", "Blue")
-                                   ))
+                                   ),   
+                                   selectInput("name",
+                                              label = "Which State?",
+                                              choices = usa_states)
+                                   
+                      ),
+                      textOutput("race_messages")
                       
              )
       )
