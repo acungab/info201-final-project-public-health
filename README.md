@@ -9,7 +9,7 @@
   Our group had the chance to do a deep dive into what the United States is made up, and most importantly what type of people live around us. We walk around everyday and do not
   see what type of people make up our local community let alone our country. As a team one of our main goals was to show people the demographics that surround us everyday.
   One of our guiding questions was what makes up Washington State, our own state we living in. We found how diverse it actually is, having different counties with reservations
-  and prominent native Hawaiian population where others have little to none.
+  and prominent native Hawaiian population where others have little to none
 
   From what we found looking at Washington State, we asked ourselves why stop there? Going a little bigger we looked at the whole United States population and saw how each race
   was very present in each and every state, and how overall most races were increasing in numbers. Looking how the population is growing we went to the state level to examine
